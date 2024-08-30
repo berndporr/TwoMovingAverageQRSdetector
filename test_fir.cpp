@@ -1,8 +1,5 @@
-// Floating point example
-//
-
 // This is the only include you need
-#include "engzee.h"
+#include "two_avg_qrs_det.h"
 #include "math.h"
 
 #include <stdio.h>

@@ -6,6 +6,7 @@
 #include <deque>
 #include <algorithm>
 #include <numeric>
+#include <Iir.h>
 
 class Fir {
 public:
@@ -50,7 +51,7 @@ public:
         return max;
     }
     
-    inline float average(const float input) const {
+    inline float average(const float input) {
 	push(input);
         float a = 0.0;
         for(auto &v:buffer) {
@@ -94,24 +95,26 @@ public:
  * @param samplingrate The sampling rate in Hz in the region of 250Hz..300Hz.
  * @param callback An instancce of the HRCallback class
  */
-    TwoMovingAverageQRSdetector(float samplingrate, bool debug = false) {
+    TwoMovingAverageQRSdetector(float samplingrate) {
         fs = samplingrate;
 	lowpass.setup(fs, f_lowpass);
 	highpass.setup(fs, f_highpass);
-        window1.init(int(0.12*fs));
-	window2.init(int(0.6*fs));
-	thres_within_roi = int(0.08*fs);
-	ignore_duration = int(0.3*fs);
+        window1.init((int)(0.12*fs));
+	window2.init((int)(0.6*fs));
+	thres_within_roi = (int)(0.08*fs);
+	ignore_duration = (int)(0.3*fs);
+	ignore_ctr = (int)fs;
     }
 
-    void registerCallback(HRCallback& cb) {
+    void registerCallback(HRCallback* cb) {
 	hrCallbacks.push_back(cb);
     }
     
     void detect(float unfiltered_ecg) {
-	double filtered_ecg = lowpass.filter(highpass(unfiltered_ecg));
-	mwa_qrs = window1.average(abs(filtered_ecg));
-        mwa_beat = window2.average(abs(filtered_ecg));
+	sample_ctr++;
+	float filtered_ecg = lowpass.filter(highpass.filter(unfiltered_ecg));
+	float mwa_qrs = window1.average(abs(filtered_ecg));
+        float mwa_beat = window2.average(abs(filtered_ecg));
 	if (ignore_ctr > 0) {
 	    ignore_ctr--;
 	    within_roi_ctr = 0;
@@ -121,21 +124,20 @@ public:
 	    within_roi_ctr++;
 	    if (within_roi_ctr > thres_within_roi) {
 		for(auto& cb: hrCallbacks) {
-		    cb.hasQRS(sample_ctr);
+		    cb->hasQRS(sample_ctr);
 		    ignore_ctr = ignore_duration;
 		}
 	    }
 	} else {
 	    within_roi_ctr = 0;
 	}
-	sample_ctr++;
     }
     
 private:
     
-    const double f_highpass = 8;
-    const double f_lowpass = 20;
-    const double order = 4;
+    static constexpr double f_highpass = 8;
+    static constexpr double f_lowpass = 20;
+    static constexpr int order = 4;
     
     Iir::Butterworth::LowPass<order> lowpass;
     Iir::Butterworth::HighPass<order> highpass;
@@ -149,9 +151,11 @@ private:
     int ignore_ctr = 0;
     int ignore_duration = 0;
 
-    long int sample_ctr = 0;
+    long int sample_ctr = -1;
 
-    std::vector<HRCallback> hrCallbacks;
+    std::vector<HRCallback*> hrCallbacks;
+
+    float fs;
 };
 
 #endif

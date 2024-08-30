@@ -23,7 +23,7 @@ filtered_ecg = signal.lfilter(b, a, unfiltered_ecg)
 
 detectors = Detectors(fs)
 
-r_peaks = detectors.engzee_detector(filtered_ecg)
+r_peaks = detectors.two_average_detector(filtered_ecg)
 intervals = np.diff(r_peaks)
 heart_rate = 60.0/(intervals/float(fs))
 

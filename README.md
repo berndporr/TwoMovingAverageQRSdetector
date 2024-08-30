@@ -25,6 +25,29 @@ struct MyCallback : HRCallback {
 
 ```
 
+Create an instance of the detector:
+
+```
+TwoMovingAverageQRSdetector twoavg(fs);
+```
+with `fs` being the sampling rate.
+
+
+Register the callback:
+
+```
+twoavg.registerCallback(&callback);
+```
+
+And then in your realtime application feed the ECG sample by sample into the detector:
+
+```
+twoavg.detect(a);
+```
+
+The callback is then called whenever there is a QRS detected.
+
+
 ## Demo
 
 Install the IIR filter library (https://github.com/berndporr/iir1)
@@ -43,6 +66,8 @@ gnuplot or the script `plot_hr.py`.
 If you have the python detector installed then you can
 compare its output with that from this detector:
 `compare_cpp_and_python_detector.py`
+
+![alt tag](compare_cpp_py.png)
 
 # Credit
 

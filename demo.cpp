@@ -13,9 +13,8 @@ struct MyCallback : HRCallback {
 	fs = samplingrate;
     }
     virtual void hasQRS(long int sampleNo) {
-	print("Pulse!\n");
 	if (previousQRSsampleNo != sampleNo) {
-	    float hr = fs/(sampleNo - previousQRSsampleNo)*60;
+	    float hr = fs/(float)(sampleNo - previousQRSsampleNo)*60.0f;
 	    printf("HR = %f\n",hr);
 	    fprintf(f,"%f\n",hr);
 	}
@@ -39,7 +38,7 @@ int main (int,char**)
     MyCallback callback(f,fs);
 
     TwoMovingAverageQRSdetector twoavg(fs);
-    twoavg.registerCallback(callback);
+    twoavg.registerCallback(&callback);
 
     FILE *finput = fopen("example_data/ECG.tsv","rt");
     for(;;) 
