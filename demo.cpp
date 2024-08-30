@@ -3,39 +3,41 @@
 #include <stdio.h>
 #include "Iir.h"
 
-struct MyCallback : HRCallback {
-    FILE* f;
-    long int n = 0;
-    float fs = 0;
-    long int previousQRSsampleNo = 0;
-    MyCallback(FILE* hrFile, float samplingrate) {
-	f = hrFile;
+struct MyCallback : TwoMovingAverageQRSdetector::QRSDetectionCallback {
+    MyCallback(float samplingrate) {
 	fs = samplingrate;
+	f = fopen("hr.dat","wt");
+	if (!f) {
+	    fprintf(stderr,"Could not open hr.dat\n");
+	    exit(1);
+	}
     }
-    virtual void hasQRS(long int sampleNo) {
+    ~MyCallback() {
+	fclose(f);
+    }
+    virtual void twoMovingAverageQRSdetected(long int sampleNo) {
 	if (previousQRSsampleNo != sampleNo) {
 	    float hr = fs/(float)(sampleNo - previousQRSsampleNo)*60.0f;
 	    printf("HR = %f\n",hr);
-	    fprintf(f,"%f\n",hr);
+	    if (f) fprintf(f,"%f\n",hr);
 	}
 	previousQRSsampleNo = sampleNo;
     }
+    FILE* f = NULL;
+    float fs = 0;
+    long int previousQRSsampleNo = 0;
 };
 
 int main (int,char**)
 {
     const float fs = 250;
     const float mains = 50;
-    Iir::Butterworth::BandStop<2> iirnotch;
+    const int filterorder = 2;
+    
+    Iir::Butterworth::BandStop<filterorder> iirnotch;
     iirnotch.setup(fs,mains,2);
 
-    FILE* f = fopen("hr.dat","wt");
-    if (!f) {
-	fprintf(stderr,"Could not open hr.dat\n");
-	exit(1);
-    }
-    
-    MyCallback callback(f,fs);
+    MyCallback callback(fs);
 
     TwoMovingAverageQRSdetector twoavg(fs);
     twoavg.registerCallback(&callback);
@@ -49,6 +51,4 @@ int main (int,char**)
 	twoavg.detect(a);
     }
     fclose(finput);
-    
-    fclose(f);
 }

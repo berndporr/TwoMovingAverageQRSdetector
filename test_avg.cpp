@@ -13,7 +13,7 @@ void assertEqual(float a, float b) {
 }
 
 int main (int,char**) {
-	DelayLine fir;
+    TwoMovingAverageQRSdetector::DelayLine fir;
 	const int N = 8;
 	fir.init(N);
 	float acc = 0;
