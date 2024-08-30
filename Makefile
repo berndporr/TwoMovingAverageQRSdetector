@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /home/bp1/sandbox/TwoMovingAverageQRSdetector
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -130,17 +140,17 @@ demo/fast:
 .PHONY : demo/fast
 
 #=============================================================================
-# Target rules for targets named test_fir
+# Target rules for targets named test_avg
 
 # Build rule for target.
-test_fir: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_fir
-.PHONY : test_fir
+test_avg: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_avg
+.PHONY : test_avg
 
 # fast build rule for target.
-test_fir/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fir.dir/build.make CMakeFiles/test_fir.dir/build
-.PHONY : test_fir/fast
+test_avg/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_avg.dir/build.make CMakeFiles/test_avg.dir/build
+.PHONY : test_avg/fast
 
 demo.o: demo.cpp.o
 .PHONY : demo.o
@@ -166,29 +176,29 @@ demo.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/demo.cpp.s
 .PHONY : demo.cpp.s
 
-test_fir.o: test_fir.cpp.o
-.PHONY : test_fir.o
+test_avg.o: test_avg.cpp.o
+.PHONY : test_avg.o
 
 # target to build an object file
-test_fir.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fir.dir/build.make CMakeFiles/test_fir.dir/test_fir.cpp.o
-.PHONY : test_fir.cpp.o
+test_avg.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_avg.dir/build.make CMakeFiles/test_avg.dir/test_avg.cpp.o
+.PHONY : test_avg.cpp.o
 
-test_fir.i: test_fir.cpp.i
-.PHONY : test_fir.i
+test_avg.i: test_avg.cpp.i
+.PHONY : test_avg.i
 
 # target to preprocess a source file
-test_fir.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fir.dir/build.make CMakeFiles/test_fir.dir/test_fir.cpp.i
-.PHONY : test_fir.cpp.i
+test_avg.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_avg.dir/build.make CMakeFiles/test_avg.dir/test_avg.cpp.i
+.PHONY : test_avg.cpp.i
 
-test_fir.s: test_fir.cpp.s
-.PHONY : test_fir.s
+test_avg.s: test_avg.cpp.s
+.PHONY : test_avg.s
 
 # target to generate assembly for a file
-test_fir.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_fir.dir/build.make CMakeFiles/test_fir.dir/test_fir.cpp.s
-.PHONY : test_fir.cpp.s
+test_avg.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_avg.dir/build.make CMakeFiles/test_avg.dir/test_avg.cpp.s
+.PHONY : test_avg.cpp.s
 
 # Help Target
 help:
@@ -198,14 +208,15 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... demo"
-	@echo "... test_fir"
+	@echo "... test_avg"
 	@echo "... demo.o"
 	@echo "... demo.i"
 	@echo "... demo.s"
-	@echo "... test_fir.o"
-	@echo "... test_fir.i"
-	@echo "... test_fir.s"
+	@echo "... test_avg.o"
+	@echo "... test_avg.i"
+	@echo "... test_avg.s"
 .PHONY : help
 
 

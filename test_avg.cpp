@@ -13,9 +13,9 @@ void assertEqual(float a, float b) {
 }
 
 int main (int,char**) {
-	std::vector<float> c({1,3,2,-5,8,-8,7,9});
-	Fir fir;
-	fir.init(c);
+	DelayLine fir;
+	const int N = 8;
+	fir.init(N);
 	float acc = 0;
 	for(int i = 0;i < 16;i++) {
 		float v = 0;
@@ -24,15 +24,15 @@ int main (int,char**) {
 		}
 		// let's filter a delta pulse at time step 1 and
 		// a unit step at time step 10
-		v = fir.filter(v);
+		v = fir.average(v);
 		// now let's check if the filter has done the right ops
 		// the delta pulse should reproduce the impulse respnse
 		if ( (i < 9) && (i > 0) ) {
-			assertEqual(c[i-1],v);
+		    assertEqual(1.0f/(float)N,v);
 		}
 		// and the step response should accumulate it
 		if (i > 10) {
-			acc = acc + c[i - 11];
+		    acc = acc + 1.0f/(float)N;
 			assertEqual(v,acc);
 		}
 	}

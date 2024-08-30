@@ -14,4 +14,6 @@ add_compile_options(-Wall -Wconversion -Wextra -pedantic)
 add_executable(demo demo.cpp)
 target_link_libraries(demo iir)
 
-add_executable(test_fir test_fir.cpp)
+enable_testing()
+add_executable(test_avg test_avg.cpp)
+add_test(TestMovingAverage test_avg)
